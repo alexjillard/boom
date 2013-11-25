@@ -118,8 +118,8 @@ def print_stats(results):
     print('BSI: Boom Speed Index')
 
 
-def print_server_info(url, method, headers=None):
-    res = requests.head(url)
+def print_server_info(url, method, headers=None, verify_ssl=True):
+    res = requests.head(url, verify=verify_ssl)
     print('Server Software: %s' % res.headers.get('server', 'Unknown'))
     print('Running %s %s' % (method, url))
 
@@ -173,7 +173,7 @@ def onecall(method, url, results, **options):
 
 def run(url, num=1, duration=None, method='GET', data=None, ct='text/plain',
         auth=None, concurrency=1, headers=None, hook=None, quiet=False,
-        ssl_verify=True,):
+        verify_ssl=True,):
 
     if headers is None:
         headers = {}
@@ -197,7 +197,7 @@ def run(url, num=1, duration=None, method='GET', data=None, ct='text/plain',
     if auth is not None:
         options['auth'] = tuple(auth.split(':', 1))
 
-    options['verify'] = ssl_verify
+    options['verify'] = verify_ssl
 
     pool = Pool(concurrency)
 
@@ -254,8 +254,8 @@ def resolve(url):
 def load(url, requests, concurrency, duration, method, data, ct, auth,
          headers=None, hook=None, quiet=False, verify_ssl=True):
     if not quiet:
-        print_server_info(url, method, headers=headers)
 
+        print_server_info(url, method, headers=headers, verify_ssl=verify_ssl)
         if requests is not None:
             print('Running %d queries - concurrency %d' % (requests,
                                                            concurrency))

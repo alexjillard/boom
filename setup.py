@@ -2,7 +2,11 @@ from setuptools import setup, find_packages
 from boom import __version__
 import sys
 
-install_requires = ['gevent', 'requests', 'unittest2']
+install_requires = ['gevent>=1.0rc3,<2', 'requests', 'unittest2']
+
+dependency_links = [
+    'https://github.com/downloads/surfly/gevent/gevent-1.0rc3.tar.gz#egg=gevent-1.0rc3'
+]
 
 if sys.version_info < (2, 7):
     install_requires += ['argparse']
@@ -31,6 +35,7 @@ setup(name='boom',
       zip_safe=False,
       classifiers=classifiers,
       install_requires=install_requires,
+      dependency_links=dependency_links,
       test_suite='unittest2.collector',
       entry_points="""
       [console_scripts]

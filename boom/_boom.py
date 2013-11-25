@@ -172,7 +172,8 @@ def onecall(method, url, results, **options):
 
 
 def run(url, num=1, duration=None, method='GET', data=None, ct='text/plain',
-        auth=None, concurrency=1, headers=None, hook=None, quiet=False):
+        auth=None, concurrency=1, headers=None, hook=None, quiet=False,
+        ssl_verify=True,):
 
     if headers is None:
         headers = {}
@@ -195,6 +196,8 @@ def run(url, num=1, duration=None, method='GET', data=None, ct='text/plain',
 
     if auth is not None:
         options['auth'] = tuple(auth.split(':', 1))
+
+    options['verify'] = ssl_verify
 
     pool = Pool(concurrency)
 
@@ -249,7 +252,7 @@ def resolve(url):
 
 
 def load(url, requests, concurrency, duration, method, data, ct, auth,
-         headers=None, hook=None, quiet=False):
+         headers=None, hook=None, quiet=False, verify_ssl=True):
     if not quiet:
         print_server_info(url, method, headers=headers)
 
@@ -263,7 +266,8 @@ def load(url, requests, concurrency, duration, method, data, ct, auth,
         sys.stdout.write('Starting the load')
     try:
         return run(url, requests, duration, method, data, ct,
-                   auth, concurrency, headers, hook, quiet=quiet)
+                   auth, concurrency, headers, hook, quiet=quiet,
+                   verify_ssl=verify_ssl,)
     finally:
         if not quiet:
             print(' Done')
@@ -304,6 +308,10 @@ def main():
                         help='Prints the results in JSON instead of the '
                              'default format',
                         action='store_true')
+
+    parser.add_argument('--no-ssl-verify',
+                        help='Disables verification of SSL certificates.',
+                        action='store_false')
 
     group = parser.add_mutually_exclusive_group()
 
@@ -361,7 +369,8 @@ def main():
     try:
         res = load(url, args.requests, args.concurrency, args.duration,
                    args.method, args.data, args.content_type, args.auth,
-                   headers=headers, hook=args.hook, quiet=args.json_output)
+                   headers=headers, hook=args.hook, quiet=args.json_output,
+                   verify_ssl=args.no_ssl_verify)
     except RequestException as e:
         print_errors((e, ))
         sys.exit(1)
